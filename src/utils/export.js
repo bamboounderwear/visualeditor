@@ -12,6 +12,20 @@ function removeEditableAttributes(element) {
     return clone;
 }
 
+function wrapWithHTMLBoilerplate(content, title) {
+    return `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${title}</title>
+</head>
+<body>
+    ${content}
+</body>
+</html>`;
+}
+
 export function downloadTemplate(type) {
     const canvas = document.getElementById('templateCanvas');
     const cleanCanvas = removeEditableAttributes(canvas);
@@ -22,7 +36,7 @@ export function downloadTemplate(type) {
     switch(type) {
         case 'email':
         case 'landing':
-            downloadHTML(cleanCanvas);
+            downloadHTML(cleanCanvas, type);
             break;
         case 'ad':
             exportToImage(cleanCanvas);
@@ -33,13 +47,16 @@ export function downloadTemplate(type) {
     }
 }
 
-function downloadHTML(canvas) {
-    const html = canvas.innerHTML;
-    const blob = new Blob([html], { type: 'text/html' });
+function downloadHTML(canvas, type) {
+    const content = canvas.innerHTML;
+    const title = type === 'email' ? 'Email Template' : 'Landing Page';
+    const fullHTML = wrapWithHTMLBoilerplate(content, title);
+    
+    const blob = new Blob([fullHTML], { type: 'text/html' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'template.html';
+    a.download = `${type}-template.html`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
