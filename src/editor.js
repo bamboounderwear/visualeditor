@@ -22,20 +22,22 @@ export function initializeTemplateEditor(canvas, templateType) {
         setupAdConstraints(canvas);
     } else if (templateType === 'presentation') {
         setupPresentationConstraints(canvas);
+    } else if (templateType === 'landing') {
+        setupLandingConstraints(canvas);
     }
 
-    // Set up auto-scaling for large templates
-    if (templateType === 'ad' || templateType === 'presentation') {
-        setupAutoScaling(canvas);
-        window.addEventListener('resize', () => setupAutoScaling(canvas));
-    }
+    // Set up auto-scaling for all templates
+    setupAutoScaling(canvas, templateType);
+    window.addEventListener('resize', () => setupAutoScaling(canvas, templateType));
 }
 
 function setupEmailConstraints(canvas) {
     // Ensure web-safe fonts
     const elements = canvas.querySelectorAll('*');
     elements.forEach(element => {
-        element.style.fontFamily = 'Arial, Helvetica, sans-serif';
+        if (getComputedStyle(element).fontFamily !== 'Arial, Helvetica, sans-serif') {
+            element.style.fontFamily = 'Arial, Helvetica, sans-serif';
+        }
     });
 }
 
@@ -51,17 +53,54 @@ function setupPresentationConstraints(canvas) {
     canvas.style.height = '1080px';
 }
 
-function setupAutoScaling(canvas) {
+function setupLandingConstraints(canvas) {
+    // Set fixed width for landing page templates
+    canvas.style.width = '1200px';
+}
+
+function setupAutoScaling(canvas, templateType) {
     const workspace = document.querySelector('.editor-workspace');
-    const workspaceWidth = workspace.clientWidth - 40; // Account for padding
-    const workspaceHeight = workspace.clientHeight - 40;
+    if (!workspace) return;
+
+    const padding = 80; // 40px padding on each side
+    const workspaceWidth = workspace.clientWidth - padding;
+    const workspaceHeight = workspace.clientHeight - padding;
     
-    const templateWidth = parseInt(canvas.style.width);
-    const templateHeight = parseInt(canvas.style.height);
+    let templateWidth = parseInt(canvas.style.width) || canvas.clientWidth;
+    let templateHeight;
+    
+    switch(templateType) {
+        case 'ad':
+            templateHeight = 1800;
+            break;
+        case 'presentation':
+            templateHeight = 1080;
+            break;
+        case 'email':
+            templateHeight = canvas.scrollHeight;
+            break;
+        case 'landing':
+            templateHeight = canvas.scrollHeight;
+            break;
+        default:
+            templateHeight = canvas.clientHeight;
+    }
     
     const scaleX = workspaceWidth / templateWidth;
     const scaleY = workspaceHeight / templateHeight;
-    const scale = Math.min(scaleX, scaleY, 1); // Never scale up
+    
+    // Calculate the appropriate scale based on template type
+    let scale;
+    if (templateType === 'email') {
+        scale = Math.min(scaleX, 0.8); // Cap email template scale at 0.8
+    } else if (templateType === 'landing') {
+        scale = Math.min(scaleX, 0.5); // Cap landing page scale at 0.5
+    } else {
+        scale = Math.min(scaleX, scaleY, 1); // Never scale up
+    }
+    
+    // Ensure minimum scale for visibility
+    scale = Math.max(scale, 0.1);
     
     canvas.style.setProperty('--scale-factor', scale);
 }

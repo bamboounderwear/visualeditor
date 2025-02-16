@@ -10,17 +10,16 @@ body {
     line-height: 1.6;
     color: #333;
     background: #f5f5f5;
-    min-height: 100vh;
+    height: 100vh;
     overflow: hidden;
 }
 
 .app-container {
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 20px;
+    width: 100%;
     height: 100vh;
     display: flex;
     flex-direction: column;
+    overflow: hidden;
 }
 
 /* Header Styles */
@@ -29,7 +28,7 @@ body {
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    margin-bottom: 20px;
+    margin: 20px 20px 0 20px;
     flex-shrink: 0;
 }
 
@@ -61,10 +60,11 @@ body {
 /* Main Content */
 .main-content {
     flex: 1;
-    overflow: hidden;
+    margin: 20px;
     display: flex;
     flex-direction: column;
-    min-height: 0; /* Critical for nested flex containers */
+    min-height: 0;
+    overflow: hidden;
 }
 
 /* Templates Grid */
@@ -74,6 +74,10 @@ body {
     gap: 20px;
     padding: 20px;
     overflow-y: auto;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    height: 100%;
 }
 
 .template-card {
@@ -109,22 +113,24 @@ body {
 
 /* Editor Styles */
 .template-editor {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
     background: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    padding: 20px;
-    flex: 1;
-    display: flex;
+    z-index: 1000;
+    display: none;
     flex-direction: column;
-    overflow: hidden;
-    min-height: 0; /* Critical for nested flex containers */
 }
 
 .editor-toolbar {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 20px;
-    flex-shrink: 0;
+    padding: 20px;
+    background: #fff;
+    border-bottom: 1px solid #eee;
+    gap: 10px;
 }
 
 .editor-toolbar button {
@@ -134,25 +140,37 @@ body {
     background: #2c3e50;
     color: white;
     cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.editor-toolbar button:hover {
+    background: #34495e;
+}
+
+#backButton {
+    background: #666;
+}
+
+#backButton:hover {
+    background: #777;
 }
 
 .editor-workspace {
-    background: #f8f9fa;
-    padding: 20px;
-    border-radius: 4px;
     flex: 1;
+    background: #f8f9fa;
     overflow: auto;
     position: relative;
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     justify-content: center;
+    padding: 40px;
 }
 
 .template-canvas {
     background: white;
-    margin: 0 auto;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    transform-origin: top center;
+    transform-origin: center;
+    position: relative;
 }
 
 /* Editable Elements */
@@ -166,30 +184,43 @@ body {
     outline: 2px solid #2c3e50;
 }
 
-/* Ad Template Specific */
+/* Template Specific Styles */
 .ad-template {
     width: 1800px;
     height: 1800px;
     max-width: none;
 }
 
-/* Email Template Specific */
 .email-template {
-    font-family: Arial, Helvetica, sans-serif;
-    max-width: 600px;
-    margin: 0 auto;
+    width: 600px;
+    background: white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
-/* Presentation Template Specific */
 .presentation-template {
     width: 1920px;
     height: 1080px;
     max-width: none;
 }
 
+.landing-template {
+    width: 1200px;
+    background: white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
 /* Scale large templates to fit the viewport */
 .ad-template,
 .presentation-template {
     transform: scale(var(--scale-factor, 0.25));
-    margin: 20px auto;
+}
+
+/* Scale medium templates */
+.landing-template {
+    transform: scale(var(--scale-factor, 0.5));
+}
+
+/* Scale email templates */
+.email-template {
+    transform: scale(var(--scale-factor, 0.8));
 }

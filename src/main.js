@@ -27,6 +27,11 @@ function displayTemplates(category) {
             </div>
         </div>
     `).join('');
+
+    // Show header and templates grid
+    document.querySelector('.header').style.display = 'block';
+    document.getElementById('templatesGrid').style.display = 'grid';
+    document.getElementById('templateEditor').style.display = 'none';
 }
 
 // Setup event listeners
@@ -42,19 +47,18 @@ function setupEventListeners() {
     });
 
     // Template selection
-    document.getElementById('templatesGrid').addEventListener('click', (e) => {
+    document.getElementById('templatesGrid').addEventListener('click', async (e) => {
         const templateCard = e.target.closest('.template-card');
         if (templateCard) {
             const templateId = templateCard.dataset.templateId;
             currentTemplate = templates[currentCategory].find(t => t.id === templateId);
-            showEditor(currentTemplate);
+            await showEditor(currentTemplate);
         }
     });
 
     // Back button
     document.getElementById('backButton').addEventListener('click', () => {
-        document.getElementById('templatesGrid').style.display = 'grid';
-        document.getElementById('templateEditor').style.display = 'none';
+        displayTemplates(currentCategory);
     });
 
     // Download button
@@ -66,15 +70,30 @@ function setupEventListeners() {
 }
 
 // Show the template editor
-function showEditor(template) {
-    document.getElementById('templatesGrid').style.display = 'none';
-    document.getElementById('templateEditor').style.display = 'block';
-    
-    const canvas = document.getElementById('templateCanvas');
-    canvas.innerHTML = template.html;
-    canvas.className = `template-canvas ${template.type}-template`;
-    
-    initializeTemplateEditor(canvas, template.type);
+async function showEditor(template) {
+    try {
+        // Fetch the template HTML
+        const response = await fetch(template.templateUrl);
+        if (!response.ok) throw new Error('Failed to load template');
+        const html = await response.text();
+        
+        // Extract the content from within the body tag
+        const bodyContent = html.match(/<body[^>]*>([\s\S]*)<\/body>/i)?.[1] || html;
+        
+        // Hide header and templates grid, show editor
+        document.querySelector('.header').style.display = 'none';
+        document.getElementById('templatesGrid').style.display = 'none';
+        document.getElementById('templateEditor').style.display = 'flex';
+        
+        const canvas = document.getElementById('templateCanvas');
+        canvas.innerHTML = bodyContent;
+        canvas.className = `template-canvas ${template.type}-template`;
+        
+        initializeTemplateEditor(canvas, template.type);
+    } catch (error) {
+        console.error('Error loading template:', error);
+        // Handle error appropriately
+    }
 }
 
 // Initialize the application

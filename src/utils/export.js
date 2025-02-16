@@ -1,5 +1,6 @@
 import html2canvas from 'html2canvas';
 import html2pdf from 'html2pdf.js';
+import jsPDF from 'jspdf';
 
 function removeEditableAttributes(element) {
     const clone = element.cloneNode(true);
@@ -28,23 +29,43 @@ function wrapWithHTMLBoilerplate(content, title) {
 
 export function downloadTemplate(type) {
     const canvas = document.getElementById('templateCanvas');
-    const cleanCanvas = removeEditableAttributes(canvas);
+    const cleanCanvas = removeEditableAttributes(canvas.cloneNode(true));
     
-    // Reset any scaling before export
+    // Create a temporary container for the clean canvas
+    const tempContainer = document.createElement('div');
+    tempContainer.style.position = 'absolute';
+    tempContainer.style.left = '-9999px';
+    tempContainer.style.top = '-9999px';
+    document.body.appendChild(tempContainer);
+    
+    // Reset any scaling and append the clean canvas
     cleanCanvas.style.transform = 'none';
+    cleanCanvas.style.margin = '0';
+    tempContainer.appendChild(cleanCanvas);
     
-    switch(type) {
-        case 'email':
-        case 'landing':
-            downloadHTML(cleanCanvas, type);
-            break;
-        case 'ad':
-            exportToImage(cleanCanvas);
-            break;
-        case 'presentation':
-            exportToPDF(cleanCanvas);
-            break;
-    }
+    const exportPromise = new Promise((resolve, reject) => {
+        switch(type) {
+            case 'email':
+            case 'landing':
+                downloadHTML(cleanCanvas, type);
+                resolve();
+                break;
+            case 'ad':
+                exportToImage(cleanCanvas)
+                    .then(resolve)
+                    .catch(reject);
+                break;
+            case 'presentation':
+                exportToPDF(cleanCanvas)
+                    .then(resolve)
+                    .catch(reject);
+                break;
+        }
+    });
+
+    exportPromise.finally(() => {
+        document.body.removeChild(tempContainer);
+    });
 }
 
 function downloadHTML(canvas, type) {
@@ -63,40 +84,54 @@ function downloadHTML(canvas, type) {
     URL.revokeObjectURL(url);
 }
 
-function exportToImage(canvas) {
+async function exportToImage(canvas) {
     const options = {
         scale: 1,
         width: 1800,
         height: 1800,
-        backgroundColor: '#ffffff'
+        useCORS: true,
+        backgroundColor: '#ffffff',
+        logging: false,
+        removeContainer: true,
+        foreignObjectRendering: false
     };
 
-    html2canvas(canvas, options).then(renderedCanvas => {
+    try {
+        const renderedCanvas = await html2canvas(canvas, options);
         const link = document.createElement('a');
         link.download = 'template.jpg';
         link.href = renderedCanvas.toDataURL('image/jpeg', 1.0);
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-    });
+    } catch (error) {
+        console.error('Error exporting image:', error);
+    }
 }
 
-function exportToPDF(canvas) {
+async function exportToPDF(canvas) {
     const options = {
         filename: 'template.pdf',
         image: { type: 'jpeg', quality: 1 },
         html2canvas: {
             scale: 2,
+            useCORS: true,
+            backgroundColor: '#ffffff',
+            logging: false,
             width: 1920,
-            height: 1080,
-            backgroundColor: '#ffffff'
+            height: 1080
         },
         jsPDF: {
             unit: 'px',
             format: [1920, 1080],
-            orientation: 'landscape'
+            orientation: 'landscape',
+            compress: true
         }
     };
 
-    html2pdf().set(options).from(canvas).save();
+    try {
+        await html2pdf().set(options).from(canvas).save();
+    } catch (error) {
+        console.error('Error exporting PDF:', error);
+    }
 }
