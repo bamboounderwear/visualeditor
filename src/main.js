@@ -1,3 +1,4 @@
+import './styles/main.css';
 import { templates } from './templates/index.js';
 import { initializeTemplateEditor } from './editor.js';
 import { downloadTemplate } from './utils/export.js';
@@ -47,13 +48,13 @@ function setupEventListeners() {
     });
 
     // Template selection
-    document.getElementById('templatesGrid').addEventListener('click', async (e) => {
+    document.getElementById('templatesGrid').addEventListener('click', (e) => {
         const templateCard = e.target.closest('.template-card');
         if (templateCard) {
             const templateId = templateCard.dataset.templateId;
             currentTemplate = templates[currentCategory].find(t => t.id === templateId);
             if (currentTemplate) {
-                await showEditor(currentTemplate);
+                showEditor(currentTemplate);
             }
         }
     });
@@ -72,35 +73,17 @@ function setupEventListeners() {
 }
 
 // Show the template editor
-async function showEditor(template) {
-    try {
-        // Hide header and templates grid, show editor first
-        document.querySelector('.header').style.display = 'none';
-        document.getElementById('templatesGrid').style.display = 'none';
-        document.getElementById('templateEditor').style.display = 'flex';
-        
-        // Fetch the template HTML
-        const response = await fetch(template.templateUrl);
-        if (!response.ok) throw new Error('Failed to load template');
-        const html = await response.text();
-        
-        // Extract the content from within the body tag
-        const bodyContent = html.match(/<body[^>]*>([\s\S]*)<\/body>/i)?.[1] || html;
-        
-        const canvas = document.getElementById('templateCanvas');
-        canvas.innerHTML = bodyContent;
-        canvas.className = `template-canvas ${template.type}-template`;
-        
-        initializeTemplateEditor(canvas, template.type);
-    } catch (error) {
-        console.error('Error loading template:', error);
-        // Show error message to user
-        document.getElementById('templateCanvas').innerHTML = `
-            <div style="color: red; padding: 20px;">
-                Failed to load template. Please try again.
-            </div>
-        `;
-    }
+function showEditor(template) {
+    // Hide header and templates grid, show editor
+    document.querySelector('.header').style.display = 'none';
+    document.getElementById('templatesGrid').style.display = 'none';
+    document.getElementById('templateEditor').style.display = 'flex';
+    
+    const canvas = document.getElementById('templateCanvas');
+    canvas.innerHTML = template.html;
+    canvas.className = `template-canvas ${template.type}-template`;
+    
+    initializeTemplateEditor(canvas, template.type);
 }
 
 // Initialize the application
