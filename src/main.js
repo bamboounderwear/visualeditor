@@ -52,7 +52,9 @@ function setupEventListeners() {
         if (templateCard) {
             const templateId = templateCard.dataset.templateId;
             currentTemplate = templates[currentCategory].find(t => t.id === templateId);
-            await showEditor(currentTemplate);
+            if (currentTemplate) {
+                await showEditor(currentTemplate);
+            }
         }
     });
 
@@ -72,6 +74,11 @@ function setupEventListeners() {
 // Show the template editor
 async function showEditor(template) {
     try {
+        // Hide header and templates grid, show editor first
+        document.querySelector('.header').style.display = 'none';
+        document.getElementById('templatesGrid').style.display = 'none';
+        document.getElementById('templateEditor').style.display = 'flex';
+        
         // Fetch the template HTML
         const response = await fetch(template.templateUrl);
         if (!response.ok) throw new Error('Failed to load template');
@@ -80,11 +87,6 @@ async function showEditor(template) {
         // Extract the content from within the body tag
         const bodyContent = html.match(/<body[^>]*>([\s\S]*)<\/body>/i)?.[1] || html;
         
-        // Hide header and templates grid, show editor
-        document.querySelector('.header').style.display = 'none';
-        document.getElementById('templatesGrid').style.display = 'none';
-        document.getElementById('templateEditor').style.display = 'flex';
-        
         const canvas = document.getElementById('templateCanvas');
         canvas.innerHTML = bodyContent;
         canvas.className = `template-canvas ${template.type}-template`;
@@ -92,7 +94,12 @@ async function showEditor(template) {
         initializeTemplateEditor(canvas, template.type);
     } catch (error) {
         console.error('Error loading template:', error);
-        // Handle error appropriately
+        // Show error message to user
+        document.getElementById('templateCanvas').innerHTML = `
+            <div style="color: red; padding: 20px;">
+                Failed to load template. Please try again.
+            </div>
+        `;
     }
 }
 

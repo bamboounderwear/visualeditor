@@ -6,7 +6,7 @@ export const templates = {
             description: 'Clean, professional newsletter layout',
             type: 'email',
             thumbnail: '/templates/thumbnails/email-1.jpg',
-            templateUrl: '/src/templates/email/newsletter.html'
+            templateUrl: './src/templates/email/newsletter.html'
         }
     ],
     ads: [
@@ -16,7 +16,7 @@ export const templates = {
             description: 'Square format product showcase',
             type: 'ad',
             thumbnail: '/templates/thumbnails/ad-1.jpg',
-            templateUrl: '/src/templates/ads/product-ad.html'
+            templateUrl: './src/templates/ads/product-ad.html'
         }
     ],
     presentations: [
@@ -26,7 +26,7 @@ export const templates = {
             description: 'Professional slide deck template',
             type: 'presentation',
             thumbnail: '/templates/thumbnails/presentation-1.jpg',
-            templateUrl: '/src/templates/presentations/business.html'
+            templateUrl: './src/templates/presentations/business.html'
         }
     ],
     landing: [
@@ -36,7 +36,7 @@ export const templates = {
             description: 'High-converting landing page template',
             type: 'landing',
             thumbnail: '/templates/thumbnails/landing-1.jpg',
-            templateUrl: '/src/templates/landing/product.html'
+            templateUrl: './src/templates/landing/product.html'
         }
     ]
 };
