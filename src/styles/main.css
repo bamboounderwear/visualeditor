@@ -10,12 +10,16 @@ body {
     line-height: 1.6;
     color: #333;
     background: #f5f5f5;
+    min-height: 100vh;
 }
 
 .app-container {
     max-width: 1400px;
     margin: 0 auto;
     padding: 20px;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
 }
 
 /* Header Styles */
@@ -25,6 +29,7 @@ body {
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     margin-bottom: 20px;
+    flex-shrink: 0;
 }
 
 .header h1 {
@@ -51,12 +56,21 @@ body {
     color: white;
 }
 
+/* Main Content */
+.main-content {
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
 /* Templates Grid */
 .templates-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 20px;
     padding: 20px;
+    overflow-y: auto;
 }
 
 .template-card {
@@ -96,12 +110,17 @@ body {
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     padding: 20px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
 }
 
 .editor-toolbar {
     display: flex;
     justify-content: space-between;
     margin-bottom: 20px;
+    flex-shrink: 0;
 }
 
 .editor-toolbar button {
@@ -117,13 +136,16 @@ body {
     background: #f8f9fa;
     padding: 20px;
     border-radius: 4px;
-    min-height: 600px;
+    flex: 1;
+    overflow: auto;
+    position: relative;
 }
 
 .template-canvas {
     background: white;
     margin: 0 auto;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transform-origin: top center;
 }
 
 /* Editable Elements */
@@ -141,6 +163,7 @@ body {
 .ad-template {
     width: 1800px;
     height: 1800px;
+    max-width: none;
 }
 
 /* Email Template Specific */
@@ -148,4 +171,17 @@ body {
     font-family: Arial, Helvetica, sans-serif;
     max-width: 600px;
     margin: 0 auto;
+}
+
+/* Presentation Template Specific */
+.presentation-template {
+    width: 1920px;
+    height: 1080px;
+    max-width: none;
+}
+
+/* Scale large templates to fit the viewport */
+.ad-template,
+.presentation-template {
+    transform: scale(var(--scale-factor, 0.25));
 }

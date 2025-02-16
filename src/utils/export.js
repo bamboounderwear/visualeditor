@@ -1,16 +1,34 @@
+import html2canvas from 'html2canvas';
+import html2pdf from 'html2pdf.js';
+
+function removeEditableAttributes(element) {
+    const clone = element.cloneNode(true);
+    const editableElements = clone.querySelectorAll('[contenteditable]');
+    editableElements.forEach(el => {
+        el.removeAttribute('contenteditable');
+        el.style.outline = 'none';
+        el.style.padding = '0';
+    });
+    return clone;
+}
+
 export function downloadTemplate(type) {
     const canvas = document.getElementById('templateCanvas');
+    const cleanCanvas = removeEditableAttributes(canvas);
+    
+    // Reset any scaling before export
+    cleanCanvas.style.transform = 'none';
     
     switch(type) {
         case 'email':
         case 'landing':
-            downloadHTML(canvas);
+            downloadHTML(cleanCanvas);
             break;
         case 'ad':
-            exportToImage(canvas);
+            exportToImage(cleanCanvas);
             break;
         case 'presentation':
-            exportToPDF(canvas);
+            exportToPDF(cleanCanvas);
             break;
     }
 }
@@ -29,10 +47,17 @@ function downloadHTML(canvas) {
 }
 
 function exportToImage(canvas) {
-    html2canvas(canvas).then(canvas => {
+    const options = {
+        scale: 1,
+        width: 1800,
+        height: 1800,
+        backgroundColor: '#ffffff'
+    };
+
+    html2canvas(canvas, options).then(renderedCanvas => {
         const link = document.createElement('a');
         link.download = 'template.jpg';
-        link.href = canvas.toDataURL('image/jpeg', 1.0);
+        link.href = renderedCanvas.toDataURL('image/jpeg', 1.0);
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
@@ -40,7 +65,21 @@ function exportToImage(canvas) {
 }
 
 function exportToPDF(canvas) {
-    html2pdf()
-        .from(canvas)
-        .save('template.pdf');
+    const options = {
+        filename: 'template.pdf',
+        image: { type: 'jpeg', quality: 1 },
+        html2canvas: {
+            scale: 2,
+            width: 1920,
+            height: 1080,
+            backgroundColor: '#ffffff'
+        },
+        jsPDF: {
+            unit: 'px',
+            format: [1920, 1080],
+            orientation: 'landscape'
+        }
+    };
+
+    html2pdf().set(options).from(canvas).save();
 }
