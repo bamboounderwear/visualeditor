@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brand Template Builder</title>
+    <link rel="stylesheet" href="/src/styles/main.css">
+</head>
+<body>
+    <div class="app-container">
+        <header class="header">
+            <h1>Brand Template Builder</h1>
+            <div class="template-categories">
+                <button data-category="email" class="category-btn active">Email Templates</button>
+                <button data-category="ads" class="category-btn">Ad Templates</button>
+                <button data-category="presentations" class="category-btn">Presentations</button>
+                <button data-category="landing" class="category-btn">Landing Pages</button>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <div class="templates-grid" id="templatesGrid"></div>
+            
+            <div class="template-editor" id="templateEditor" style="display: none;">
+                <div class="editor-toolbar">
+                    <button id="backButton">← Back to Templates</button>
+                    <button id="downloadButton">Download</button>
+                </div>
+                <div class="editor-workspace">
+                    <div id="templateCanvas" class="template-canvas"></div>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script type="module" src="/src/main.js"></script>
+</body>
+</html>
